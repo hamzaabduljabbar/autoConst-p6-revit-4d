@@ -88,14 +88,37 @@ three. The skill was built on a fork of it.
 6. **Test:** open a project in Revit and go to http://localhost:48884/revit_mcp/status/ in a browser. It should
    report `active`. In Claude, ask "check Revit status".
 
-Then ask Claude: *"link this P6 schedule to the open Revit model"* (attach the .xer), or *"here's next
-month's XER, update the 4D"*.
+## How to use
 
-Revit writes run inside one undoable transaction per step (Ctrl+Z in Revit). The skill never saves your file
-unless you ask it to.
+**First time on a project**
+1. Open the model in Revit and start Claude Code in your project folder.
+2. Say: *"link this P6 schedule to the open Revit model"* and attach or point to the `.xer` (or an MS Project
+   `.xml`). If you don't have Revit, give it an `.ifc` instead.
+3. Claude reads both, maps every activity, and checks the result. You get:
+   - a summary;
+   - the **questions** the data couldn't settle (each with options and a default);
+   - any build-order findings;
+   - the elements that belong to no activity.
+4. Answer the questions in chat. Each answer is applied straight away and the mapping is rebuilt.
+5. Say "approved". Claude writes the P6 parameters into Revit, builds the 4D views and schedules, and opens
+   "AutoConst 4D - by month".
+6. Open any element's Properties: the **AutoConst 4D** group shows its P6 activity, start, finish, week and month.
 
-Then ask Claude: *"link this P6 schedule to the open Revit model"* (attach the .xer), or *"here's next
-month's XER, update the 4D"*.
+**Every schedule update**
+1. Say: *"here's next month's XER, update the 4D"*.
+2. Claude lists what changed (added, renamed, deleted, delayed) and asks only new questions. It never repeats ones you already answered.
+3. After you approve, it writes only the changes. It checks Revit's counts against its prediction and opens
+   the changes view (red = delayed, blue = new, grey = unchanged).
+
+**Video frames:** ask for "weekly 4D views" to get one view per week of the build.
+
+Everything Claude decided is in the job folder (`outputs/<job>/`):
+- `rationale.md`: every link and its reason;
+- `questions.md`: the questions and your answers;
+- `check.md`: the check results;
+- `changes.md`: for revisions, what changed.
+
+Each Revit write is one undoable step (Ctrl+Z in Revit). The skill never saves your file unless you ask.
 
 ## Limits
 
