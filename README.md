@@ -55,11 +55,44 @@ The project is Schependomlaan, an apartment building in NL (public dataset, CC B
 
 ## Install
 
+### 1. The skill
 1. Copy this folder to `~/.claude/skills/p6-revit-4d` (or your project's `.claude/skills/`).
-2. Python 3.10+. `pip install ifcopenshell` is needed only to read IFC models.
-3. For Revit: a Revit MCP server that exposes `execute_revit_code` (IronPython through pyRevit), `set_active_view`
-   and `get_revit_view`. Built and tested with the AutoConst Revit MCP, a fork of the open-source
-   revit-mcp-server. With an IFC model, steps 1–6 work without Revit.
+2. Install Python 3.10+. `pip install ifcopenshell` is needed only to read IFC models.
+
+With an IFC model, steps 1–6 (read, map, questions, check) work **without Revit**. Writing into Revit and
+building the views needs a Revit MCP server.
+
+### 2. A Revit MCP server (for live Revit)
+The skill uses only 3 MCP tools: `execute_revit_code`, `set_active_view` and `get_revit_view`. The free,
+open-source [revit-mcp-server](https://github.com/Demolinator/revit-mcp-server) (MIT, Revit 2024–2027) has all
+three. The skill was built on a fork of it.
+
+1. **pyRevit:** download the installer from [pyRevit releases](https://github.com/pyrevitlabs/pyRevit/releases),
+   run it, and open Revit. A **pyRevit** tab appears.
+2. **Routes server:** go to pyRevit tab → Settings → Routes, switch the server on (port 48884), save, and let pyRevit reload.
+3. **Install `uv`** ([guide](https://docs.astral.sh/uv/getting-started/installation/)), then:
+   ```
+   git clone https://github.com/Demolinator/revit-mcp-server
+   cd revit-mcp-server
+   uv sync
+   ```
+4. **Load the server as a pyRevit extension:** create a folder such as `C:\pyRevitExtensions` and link the repo into it:
+   ```
+   New-Item -ItemType Junction -Path C:\pyRevitExtensions\revit-mcp.extension -Target C:\path\to\revit-mcp-server
+   ```
+   Then go to pyRevit → Settings → Custom Extension Directories, add `C:\pyRevitExtensions`, and reload.
+   Don't use the "MCP Server for Revit Python" entry in pyRevit's extension manager; that is the older
+   upstream version.
+5. **Connect Claude:** add the server to Claude Code (`claude mcp add revit -- uv --directory C:\path\to\revit-mcp-server run main.py`)
+   or to Claude Desktop's config. The server's own README has the exact JSON.
+6. **Test:** open a project in Revit and go to http://localhost:48884/revit_mcp/status/ in a browser. It should
+   report `active`. In Claude, ask "check Revit status".
+
+Then ask Claude: *"link this P6 schedule to the open Revit model"* (attach the .xer), or *"here's next
+month's XER, update the 4D"*.
+
+Revit writes run inside one undoable transaction per step (Ctrl+Z in Revit). The skill never saves your file
+unless you ask it to.
 
 Then ask Claude: *"link this P6 schedule to the open Revit model"* (attach the .xer), or *"here's next
 month's XER, update the 4D"*.
