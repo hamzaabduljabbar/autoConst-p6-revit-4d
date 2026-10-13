@@ -83,7 +83,7 @@ three. The skill was built on a fork of it.
    Then go to pyRevit → Settings → Custom Extension Directories, add `C:\pyRevitExtensions`, and reload.
    Don't use the "MCP Server for Revit Python" entry in pyRevit's extension manager; that is the older
    upstream version.
-5. **Connect Claude:** add the server to Claude Code (`claude mcp add revit -- uv --directory C:\path\to\revit-mcp-server run main.py`)
+5. **Connect Claude:** add the server to Claude Code (`claude mcp add revit -- uv run --directory C:\path\to\revit-mcp-server main.py`)
    or to Claude Desktop's config. The server's own README has the exact JSON.
 6. **Test:** open a project in Revit and go to http://localhost:48884/revit_mcp/status/ in a browser. It should
    report `active`. In Claude, ask "check Revit status".
