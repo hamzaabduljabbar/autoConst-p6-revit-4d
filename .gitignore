@@ -1,0 +1,4 @@
+outputs/
+__pycache__/
+*.pyc
+autoconst_4d_shared_params.txt
